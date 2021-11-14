@@ -1,10 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.CodeAnalysis.Text;
 using System.Linq;
 using System.Text;
-using TechTalks.Generators.Emitters;
 using TechTalks.Generators.Models;
 
 namespace TechTalks.Generators.Emitters
@@ -22,7 +18,7 @@ namespace TechTalks.Generators.Emitters
       WriteUsings(src);
 
       WriteStartNamespace(src);
-      
+
       WriteStartClass(src);
 
       WriteFields(src);

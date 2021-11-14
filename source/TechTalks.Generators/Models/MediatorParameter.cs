@@ -1,8 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
-using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace TechTalks.Generators.Models
 {

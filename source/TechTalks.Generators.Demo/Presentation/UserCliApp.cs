@@ -1,11 +1,6 @@
 ﻿using ConsoleTables;
 using MediatR;
 using Sharprompt;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechTalks.Generators.Demo.Application.Requests;
 
 namespace TechTalks.Generators.Demo.Presentation

@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -44,7 +43,7 @@ namespace TechTalks.Generators
       }
       try
       {
-        if (context.SemanticModel.GetDeclaredSymbol(context.Node, ct) is IMethodSymbol method 
+        if (context.SemanticModel.GetDeclaredSymbol(context.Node, ct) is IMethodSymbol method
           && method.GetAttributes().Any(attr => attr.AttributeClass.Name == "HandlerAttribute"))
         {
           return new MediatorGroup(method);
