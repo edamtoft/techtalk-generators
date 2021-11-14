@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TechTalks.Generators.Mediator.Emitters;
-using TechTalks.Generators.Mediator.Models;
+using TechTalks.Generators.Emitters;
+using TechTalks.Generators.Models;
 
-namespace TechTalks.Generators.Mediator.Emitters
+namespace TechTalks.Generators.Emitters
 {
   internal sealed class HandlerEmitter : ISourceEmitter
   {
@@ -99,7 +99,7 @@ namespace TechTalks.Generators.Mediator.Emitters
 
     private void WriteConstructor(StringBuilder src)
     {
-      src.AppendLine($"    public {Group.HandlerName}({Group.Class.Name} handlers)");
+      src.AppendLine($"    public {Group.HandlerName}({Group.Class} handlers)");
       src.AppendLine("    {");
       src.AppendLine($"      _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));");
       src.AppendLine("    }");
@@ -108,14 +108,14 @@ namespace TechTalks.Generators.Mediator.Emitters
 
     private void WriteFields(StringBuilder src)
     {
-      src.AppendLine($"    private readonly {Group.Class.Name} _handlers;");
+      src.AppendLine($"    private readonly {Group.Class} _handlers;");
       src.AppendLine();
     }
 
     private void WriteStartClass(StringBuilder src)
     {
       src.AppendLine("  /// <summary>");
-      src.AppendLine($"  /// Auto-generated handler based on handler defined in <see cref=\"{Group.Class.Name}\"/>.");
+      src.AppendLine($"  /// Auto-generated handler based on handler defined in <see cref=\"{Group.Class}\"/>.");
       src.AppendLine("  /// </summary>");
       src.AppendLine($"  public sealed class {Group.HandlerName} : IRequestHandler<{Group.RequestName},{Group.ResponseName}>");
       src.AppendLine("  {");
@@ -126,16 +126,18 @@ namespace TechTalks.Generators.Mediator.Emitters
       src.AppendLine("  }");
     }
 
-    private static void WriteUsings(StringBuilder src)
+    private void WriteUsings(StringBuilder src)
     {
       src.AppendLine("using System.Threading;");
       src.AppendLine("using System.Threading.Tasks;");
       src.AppendLine("using MediatR;");
+      src.AppendLine($"using {Group.Namespace}.Requests;");
+      src.AppendLine($"using {Group.Namespace}.Responses;");
     }
 
     private void WriteStartNamespace(StringBuilder src)
     {
-      src.AppendLine($"namespace {Group.Namespace}");
+      src.AppendLine($"namespace {Group.Namespace}.Handlers");
       src.AppendLine("{");
     }
 

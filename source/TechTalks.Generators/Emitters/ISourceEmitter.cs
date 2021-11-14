@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.Text;
-using TechTalks.Generators.Mediator.Models;
+using TechTalks.Generators.Models;
 
-namespace TechTalks.Generators.Mediator.Emitters
+namespace TechTalks.Generators.Emitters
 {
   internal interface ISourceEmitter
   {

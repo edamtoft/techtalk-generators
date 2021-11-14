@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TechTalks.Generators.Mediator.Models;
+using TechTalks.Generators.Models;
 
-namespace TechTalks.Generators.Mediator.Emitters
+namespace TechTalks.Generators.Emitters
 {
   internal sealed class ResponseEmitter : ISourceEmitter
   {
@@ -19,10 +19,10 @@ namespace TechTalks.Generators.Mediator.Emitters
     {
       var src = new StringBuilder();
 
-      src.AppendLine($"namespace {Group.Namespace}");
+      src.AppendLine($"namespace {Group.Namespace}.Responses");
       src.AppendLine("{");
       src.AppendLine("  /// <summary>");
-      src.AppendLine($"  /// Auto-generated response based on handler defined in <see cref=\"{Group.Class.Name}\"/>.");
+      src.AppendLine($"  /// Auto-generated response based on handler defined in <see cref=\"{Group.Class}\"/>.");
       src.AppendLine("  /// </summary>");
       src.Append($"  public record {Group.ResponseName}(");
       src.Append(string.Join(",", Group.ResponseParams.Select(p => $"{p.Type} {p.PropertyName}")));

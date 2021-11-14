@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TechTalks.Generators.Demo.Mediator.Application;
+using TechTalks.Generators.Demo.Application.Requests;
 
-namespace TechTalks.Generators.Demo.Mediator.Presentation
+namespace TechTalks.Generators.Demo.Presentation
 {
   internal class UserCliApp
   {

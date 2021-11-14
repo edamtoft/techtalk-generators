@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechTalks.Generators.Mediator.Models
+namespace TechTalks.Generators.Models
 {
   internal readonly struct MediatorGroup
   {
     public MediatorGroup(IMethodSymbol sourceMethod) : this()
     {
+
       SourceMethod = sourceMethod ?? throw new ArgumentNullException(nameof(sourceMethod));
       RequestParams = sourceMethod.Parameters.Select(p => new MediatorParameter(p)).ToImmutableArray();
       (ResponseParams, IsAwaitable) = ResolveResponseType((INamedTypeSymbol)sourceMethod.ReturnType);
@@ -21,7 +22,7 @@ namespace TechTalks.Generators.Mediator.Models
     public ImmutableArray<MediatorParameter> RequestParams { get; }
     public ImmutableArray<MediatorParameter> ResponseParams { get; }
     public bool IsAwaitable { get; }
-    public ISymbol Namespace => SourceMethod.ContainingNamespace;
+    public INamespaceSymbol Namespace => SourceMethod.ContainingNamespace;
     public ITypeSymbol Class => SourceMethod.ContainingType;
     public string RequestName => $"{SourceMethod.Name}Request";
     public string ResponseName => $"{SourceMethod.Name}Response";
@@ -48,7 +49,13 @@ namespace TechTalks.Generators.Mediator.Models
           .ToImmutableArray();
       }
 
-      return ImmutableArray.Create(new MediatorParameter("Value", returnType));
+      switch (returnType.SpecialType)
+      {
+        case SpecialType.System_Boolean:
+          return ImmutableArray.Create(new MediatorParameter("Success", returnType));
+        default:
+          return ImmutableArray.Create(new MediatorParameter("Value", returnType));
+      }
     }
   }
 }

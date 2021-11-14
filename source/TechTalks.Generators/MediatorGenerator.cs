@@ -5,10 +5,10 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using TechTalks.Generators.Mediator.Emitters;
-using TechTalks.Generators.Mediator.Models;
+using TechTalks.Generators.Emitters;
+using TechTalks.Generators.Models;
 
-namespace TechTalks.Generators.Mediator
+namespace TechTalks.Generators
 {
   [Generator]
   public sealed class MediatorGenerator : IIncrementalGenerator
@@ -18,8 +18,6 @@ namespace TechTalks.Generators.Mediator
     /// </summary>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-      //if (!Debugger.IsAttached) Debugger.Launch();
-
       var provider = context.SyntaxProvider
         .CreateSyntaxProvider(IsMethod, ResolveHandleMethod);
 
@@ -52,9 +50,11 @@ namespace TechTalks.Generators.Mediator
           return new MediatorGroup(method);
         }
       }
-      catch
+      catch (Exception err)
       {
-        // log?
+#if DEBUG
+        if (!Debugger.IsAttached) Debugger.Launch();
+#endif
       }
       return null;
     }
@@ -71,9 +71,18 @@ namespace TechTalks.Generators.Mediator
 
       var group = possibleGroup.Value;
 
-      context.AddSource($"{group.RequestName}.cs", new RequestEmitter(group).GetSource());
-      context.AddSource($"{group.ResponseName}.cs", new ResponseEmitter(group).GetSource());
-      context.AddSource($"{group.HandlerName}.cs", new HandlerEmitter(group).GetSource());
+      try
+      {
+        context.AddSource($"{group.RequestName}.cs", new RequestEmitter(group).GetSource());
+        context.AddSource($"{group.ResponseName}.cs", new ResponseEmitter(group).GetSource());
+        context.AddSource($"{group.HandlerName}.cs", new HandlerEmitter(group).GetSource());
+      }
+      catch (Exception err)
+      {
+#if DEBUG
+        if (!Debugger.IsAttached) Debugger.Launch();
+#endif
+      }
     }
   }
 }

@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TechTalks.Generators.Mediator.Models;
+using TechTalks.Generators.Models;
 
-namespace TechTalks.Generators.Mediator.Emitters
+namespace TechTalks.Generators.Emitters
 {
   internal sealed class RequestEmitter : ISourceEmitter
   {
@@ -21,11 +21,12 @@ namespace TechTalks.Generators.Mediator.Emitters
       var src = new StringBuilder();
 
       src.AppendLine("using MediatR;");
+      src.AppendLine($"using {Group.Namespace}.Responses;");
       src.AppendLine();
-      src.AppendLine($"namespace {Group.Namespace}");
+      src.AppendLine($"namespace {Group.Namespace}.Requests");
       src.AppendLine("{");
       src.AppendLine("  /// <summary>");
-      src.AppendLine($"  /// Auto-generated request based on handler defined in <see cref=\"{Group.Class.Name}\"/>.");
+      src.AppendLine($"  /// Auto-generated request based on handler defined in <see cref=\"{Group.Class}\"/>.");
       src.AppendLine("  /// </summary>");
       src.AppendLine($"  public record {Group.RequestName}({requestParams}) : IRequest<{Group.ResponseName}>;");
       src.AppendLine("}");

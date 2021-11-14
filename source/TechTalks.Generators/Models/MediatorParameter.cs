@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TechTalks.Generators.Mediator.Models
+namespace TechTalks.Generators.Models
 {
   internal readonly struct MediatorParameter
   {

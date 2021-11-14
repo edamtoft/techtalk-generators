@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using TechTalks.Generators.Demo.Mediator.Application;
-using TechTalks.Generators.Demo.Mediator.Presentation;
+using TechTalks.Generators.Demo.Application;
+using TechTalks.Generators.Demo.Presentation;
 
 var app = new ServiceCollection()
   .AddSingleton<UserHandlers>()
