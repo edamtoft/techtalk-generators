@@ -8,18 +8,23 @@ namespace TechTalks.Generators.Mediator.Models
 {
   internal readonly struct MediatorParameter
   {
-    public string Name { get; }
+    public string PropertyName { get; }
     public ITypeSymbol Type { get; }
 
     public MediatorParameter(IParameterSymbol source)
     {
-      Name = PascalCase(source.Name ?? "");
-      Type = source?.Type ?? throw new ArgumentNullException(nameof(source));
+      if (source is null)
+      {
+        throw new ArgumentNullException(nameof(source));
+      }
+
+      PropertyName = PascalCase(source.Name ?? "");
+      Type = source.Type;
     }
 
-    public MediatorParameter(string name, ITypeSymbol type)
+    public MediatorParameter(string propertyName, ITypeSymbol type)
     {
-      Name = name ?? throw new ArgumentNullException(nameof(name));
+      PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
       Type = type ?? throw new ArgumentNullException(nameof(type));
     }
 

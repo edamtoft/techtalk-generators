@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using TechTalks.Generators.Mediator.Emitters;
 using TechTalks.Generators.Mediator.Models;
@@ -20,7 +21,7 @@ namespace TechTalks.Generators.Mediator
       //if (!Debugger.IsAttached) Debugger.Launch();
 
       var provider = context.SyntaxProvider
-        .CreateSyntaxProvider(IsHandlerMethod, ResolveHandleMethod);
+        .CreateSyntaxProvider(IsMethod, ResolveHandleMethod);
 
       context.RegisterSourceOutput(provider, GenerateSource);
     }
@@ -28,30 +29,34 @@ namespace TechTalks.Generators.Mediator
     /// <summary>
     /// First tier: Select if the syntax is potentially of interest.
     /// </summary>
-    private static bool IsHandlerMethod(SyntaxNode node, CancellationToken cancellationToken)
+    private static bool IsMethod(SyntaxNode node, CancellationToken cancellationToken)
     {
-      return node is MethodDeclarationSyntax method 
-        && (method.Identifier.ValueText?.StartsWith("Handle") ?? false);
+      return node.IsKind(SyntaxKind.MethodDeclaration);
     }
 
     /// <summary>
     /// Second tier: Use the semantic model to get additional information about the method, 
     /// or rule out false positives from tier-1
     /// </summary>
-    private static MediatorGroup? ResolveHandleMethod(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static MediatorGroup? ResolveHandleMethod(GeneratorSyntaxContext context, CancellationToken ct)
     {
-      if (cancellationToken.IsCancellationRequested)
+      if (ct.IsCancellationRequested)
       {
         return null;
       }
       try
       {
-        return new MediatorGroup((IMethodSymbol)context.SemanticModel.GetDeclaredSymbol(context.Node, cancellationToken));
+        if (context.SemanticModel.GetDeclaredSymbol(context.Node, ct) is IMethodSymbol method 
+          && method.GetAttributes().Any(attr => attr.AttributeClass.Name == "HandlerAttribute"))
+        {
+          return new MediatorGroup(method);
+        }
       }
       catch
       {
-        return null;
+        // log?
       }
+      return null;
     }
 
     /// <summary>
@@ -66,9 +71,9 @@ namespace TechTalks.Generators.Mediator
 
       var group = possibleGroup.Value;
 
-      context.AddSource($"{group.Class.Name}.{group.RequestName}.cs", new RequestEmitter().GetSource(group));
-      context.AddSource($"{group.Class.Name}.{group.ResponseName}.cs", new ResponseEmitter().GetSource(group));
-      context.AddSource($"{group.Class.Name}.{group.HandlerName}.cs", new HandlerEmitter().GetSource(group));
+      context.AddSource($"{group.RequestName}.cs", new RequestEmitter(group).GetSource());
+      context.AddSource($"{group.ResponseName}.cs", new ResponseEmitter(group).GetSource());
+      context.AddSource($"{group.HandlerName}.cs", new HandlerEmitter(group).GetSource());
     }
   }
 }

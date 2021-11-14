@@ -13,34 +13,42 @@ namespace TechTalks.Generators.Mediator.Models
     public MediatorGroup(IMethodSymbol sourceMethod) : this()
     {
       SourceMethod = sourceMethod ?? throw new ArgumentNullException(nameof(sourceMethod));
-      var root = sourceMethod.Name.Substring("Handle".Length);
-      RequestName = root + "Request";
-      ResponseName = root + "Response";
-      HandlerName = root + "Handler";
       RequestParams = sourceMethod.Parameters.Select(p => new MediatorParameter(p)).ToImmutableArray();
-      (ResponseType, IsAsync) = ResolveResponseType((INamedTypeSymbol)sourceMethod.ReturnType);
+      (ResponseParams, IsAwaitable) = ResolveResponseType((INamedTypeSymbol)sourceMethod.ReturnType);
     }
 
     public IMethodSymbol SourceMethod { get; }
-    public string RequestName { get; }
-    public string ResponseName { get; }
-    public string HandlerName { get; }
     public ImmutableArray<MediatorParameter> RequestParams { get; }
-    public ITypeSymbol ResponseType { get; }
-    public bool IsAsync { get; }
+    public ImmutableArray<MediatorParameter> ResponseParams { get; }
+    public bool IsAwaitable { get; }
     public ISymbol Namespace => SourceMethod.ContainingNamespace;
     public ITypeSymbol Class => SourceMethod.ContainingType;
+    public string RequestName => $"{SourceMethod.Name}Request";
+    public string ResponseName => $"{SourceMethod.Name}Response";
+    public string HandlerName => $"{SourceMethod.Name}Handler";
 
-    private static (ITypeSymbol responseType, bool isAsync) ResolveResponseType(INamedTypeSymbol returnType)
+    private static (ImmutableArray<MediatorParameter> responseParams, bool isAwaitable) ResolveResponseType(INamedTypeSymbol returnType)
     {
       switch (returnType.Name)
       {
         case nameof(Task):
         case nameof(ValueTask):
-          return (returnType.TypeArguments[0], true);
+          return (ReturnResponseParams((INamedTypeSymbol)returnType.TypeArguments[0]), true);
         default:
-          return (returnType, false);
+          return (ReturnResponseParams(returnType), false);
       };
+    }
+
+    private static ImmutableArray<MediatorParameter> ReturnResponseParams(INamedTypeSymbol returnType)
+    {
+      if (returnType.IsTupleType)
+      {
+        return returnType.TupleElements
+          .Select(element => new MediatorParameter(element.Name, element.Type))
+          .ToImmutableArray();
+      }
+
+      return ImmutableArray.Create(new MediatorParameter("Value", returnType));
     }
   }
 }

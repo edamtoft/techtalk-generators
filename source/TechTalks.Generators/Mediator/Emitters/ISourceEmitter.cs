@@ -5,6 +5,6 @@ namespace TechTalks.Generators.Mediator.Emitters
 {
   internal interface ISourceEmitter
   {
-    SourceText GetSource(MediatorGroup group);
+    SourceText GetSource();
   }
 }
