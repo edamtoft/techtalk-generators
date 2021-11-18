@@ -9,7 +9,7 @@ namespace TechTalks.Generators.Demo.Presentation
   {
     private readonly IMediator _mediator;
 
-    public UserCliApp(IMediator mediator) => _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+    public UserCliApp(IMediator mediator) => _mediator = mediator;
 
     public async Task Run()
     {
@@ -46,20 +46,27 @@ namespace TechTalks.Generators.Demo.Presentation
 
     private async Task DeleteUser()
     {
-      var email = Prompt.Input<string>("Enter email of user to delete", validators: new[] { Validators.Required() });
+      var email = Prompt.Input<string>("Enter email of user to delete", 
+        validators: new[] { Validators.Required() });
+
       var (found, user) = await _mediator.Send(new GetUserByEmailRequest(email));
+
       if (!found)
       {
         Console.WriteLine("User not found");
         return;
       }
+
       await _mediator.Send(new DeleteUserRequest(user!.Id));
     }
 
     private async Task UpdateUser()
     {
-      var email = Prompt.Input<string>("Enter email of user to update", validators: new[] { Validators.Required() });
+      var email = Prompt.Input<string>("Enter email of user to update", 
+        validators: new[] { Validators.Required() });
+
       var (found, user) = await _mediator.Send(new GetUserByEmailRequest(email));
+
       if (!found)
       {
         Console.WriteLine("User not found");
