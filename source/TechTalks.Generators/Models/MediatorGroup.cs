@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace TechTalks.Generators.Models
 
       SourceMethod = sourceMethod ?? throw new ArgumentNullException(nameof(sourceMethod));
       RequestParams = sourceMethod.Parameters.Select(p => new MediatorParameter(p)).ToImmutableArray();
-      (ResponseParams, IsAwaitable) = ResolveResponseType((INamedTypeSymbol)sourceMethod.ReturnType);
+      (ResponseParams, IsAwaitable) = ResolveResponseType(sourceMethod, (INamedTypeSymbol)sourceMethod.ReturnType);
     }
 
     public IMethodSymbol SourceMethod { get; }
@@ -26,25 +27,35 @@ namespace TechTalks.Generators.Models
     public string ResponseName => $"{SourceMethod.Name}Response";
     public string HandlerName => $"{SourceMethod.Name}Handler";
 
-    private static (ImmutableArray<MediatorParameter> responseParams, bool isAwaitable) ResolveResponseType(INamedTypeSymbol returnType)
+    private static (ImmutableArray<MediatorParameter> responseParams, bool isAwaitable) ResolveResponseType(IMethodSymbol method, INamedTypeSymbol returnType)
     {
       switch (returnType.Name)
       {
         case nameof(Task):
         case nameof(ValueTask):
-          return (ReturnResponseParams((INamedTypeSymbol)returnType.TypeArguments[0]), true);
+          return (ReturnResponseParams(method, (INamedTypeSymbol)returnType.TypeArguments[0]), true);
         default:
-          return (ReturnResponseParams(returnType), false);
+          return (ReturnResponseParams(method, returnType), false);
       };
     }
 
-    private static ImmutableArray<MediatorParameter> ReturnResponseParams(INamedTypeSymbol returnType)
+    private static ImmutableArray<MediatorParameter> ReturnResponseParams(IMethodSymbol method, INamedTypeSymbol returnType)
     {
       if (returnType.IsTupleType)
       {
         return returnType.TupleElements
           .Select(element => new MediatorParameter(element.Name, element.Type))
           .ToImmutableArray();
+      }
+
+      var responseValue = method
+        .GetAttributes()
+        .FirstOrDefault(attr => attr.AttributeClass.Name == "HandlerAttribute")?.NamedArguments
+        .FirstOrDefault(arg => arg.Key == "ResponseValue").Value.Value;
+
+      if (responseValue is string value)
+      {
+        return ImmutableArray.Create(new MediatorParameter(value, returnType));
       }
 
       switch (returnType.SpecialType)

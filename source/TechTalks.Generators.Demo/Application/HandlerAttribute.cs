@@ -3,5 +3,6 @@
   [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
   public sealed class HandlerAttribute : Attribute
   {
+    public string? ResponseValue { get; set; }
   }
 }

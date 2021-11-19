@@ -83,7 +83,8 @@ namespace TechTalks.Generators.Demo.Presentation
     {
       var result = await _mediator.Send(new ListUsersRequest());
 
-      ConsoleTable.From(result.Value)
+      ConsoleTable
+        .From(result.Users)
         .Write(Format.Default);
     }
 
@@ -94,7 +95,7 @@ namespace TechTalks.Generators.Demo.Presentation
 
       var response = await _mediator.Send(new CreateUserRequest(name, email));
 
-      Console.Write($"User created: {response.Value}");
+      Console.Write($"User created: {response.UserId}");
     }
   }
 }

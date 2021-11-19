@@ -6,9 +6,10 @@ namespace TechTalks.Generators.Demo.Application
   {
     private readonly List<User> _users = new();
 
-    [Handler]
+    [Handler(ResponseValue = "UserId")]
     internal Guid CreateUser(string name, string email)
     {
+
       var userId = Guid.NewGuid();
       _users.Add(new User(userId, name, email));
       return userId;
@@ -25,11 +26,7 @@ namespace TechTalks.Generators.Demo.Application
     internal (bool Found, User? User) GetUserByEmail(string email)
     {
       var user = _users.FirstOrDefault(user => user.Email == email);
-      if (user is null)
-      {
-        return (false, null);
-      }
-      return (true, user);
+      return (user is not null, user);
     }
 
     [Handler]
@@ -45,7 +42,7 @@ namespace TechTalks.Generators.Demo.Application
       return true;
     }
 
-    [Handler]
+    [Handler(ResponseValue = "Users")]
     internal List<User> ListUsers()
     {
       return _users.ToList();
