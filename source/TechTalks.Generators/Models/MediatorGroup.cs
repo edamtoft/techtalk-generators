@@ -50,7 +50,7 @@ namespace TechTalks.Generators.Models
       switch (returnType.SpecialType)
       {
         case SpecialType.System_Boolean:
-          return ImmutableArray.Create(new MediatorParameter("Success", returnType));
+          return ImmutableArray.Create(new MediatorParameter("Successful", returnType));
         default:
           return ImmutableArray.Create(new MediatorParameter("Value", returnType));
       }
