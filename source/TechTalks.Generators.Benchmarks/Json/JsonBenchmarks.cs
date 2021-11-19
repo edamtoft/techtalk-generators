@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace TechTalks.Generators.Benchmarks.Json
 {
+  [WarmupCount(3),IterationCount(5)]
   public class JsonBenchmarks
   {
     [Benchmark]
